@@ -1,0 +1,94 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "astronomer-snowpatrol-plugin"
+dynamic = ["version"]
+description = 'The SnowPatrol Plugin seamlessly integrates Airflow DAG and Task metadata with Snowflake using Query Tags'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "Apache-2.0"
+keywords = ["airflow", "apache-airflow", "astronomer", "dags", "Snowflake"]
+authors = [
+  { name = "Olivier Daneau", email = "olivier.daneau@astronomer.io" },
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: Apache Airflow",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = ["apache-airflow>=2.3.0"]
+
+[project.entry-points.astronomer-snowpatrol-plugin]
+_ = 'plugin'
+
+[project.urls]
+Homepage = "https://github.com/astronomer/snowpatrol-plugin"
+Documentation = "https://github.com/astronomer/snowpatrol-plugin#readme"
+Issues = "https://github.com/astronomer/snowpatrol-plugin/issues"
+Source = "https://github.com/astronomer/snowpatrol-plugin"
+
+[tool.hatch.version]
+path = "plugin/version.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["/plugin"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["plugin"]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.types]
+dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:plugin/astronomer_snowpatrol tests}"
+
+[tool.coverage.run]
+source_pkgs = ["plugin", "tests"]
+branch = true
+parallel = true
+omit = [
+  "plugin/version.py",
+]
+
+[tool.coverage.paths]
+astronomer_snowpatrol = ["plugin/"]
+tests = ["tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]

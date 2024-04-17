@@ -1,0 +1,40 @@
+name: Client Python Package
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main", "dev"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: |
+            3.8
+            3.9
+            3.10
+            3.11
+            3.12
+      - name: Set up pip cache
+        if: runner.os == 'Linux'
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install Hatch
+        run: pipx install hatch
+      - name: Run tests
+        run: hatch run test:test
+      - name: Build dist
+        run: hatch build
+      - name: Publish on Test PyPI
+        if: github.ref == 'refs/heads/dev'
+        run: hatch publish --repository testpypi
+      - name: Publish on PyPI
+        if: github.ref == 'refs/heads/main'
+        run: hatch publish
