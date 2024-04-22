@@ -26,5 +26,7 @@ def task_policy(task: BaseOperator):
     task.template_fields = (*task.template_fields, "hook_params")
     # Override hook params to add Snowflake Query Tag
     task.hook_params = (
-        {**task.hook_params, **SNOWFLAKE_HOOK_PARAMS} if task.hook_params else SNOWFLAKE_HOOK_PARAMS
+        {**task.hook_params, **SNOWFLAKE_HOOK_PARAMS}
+        if task.hook_params
+        else SNOWFLAKE_HOOK_PARAMS
     )
