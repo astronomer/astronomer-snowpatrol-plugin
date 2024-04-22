@@ -83,8 +83,11 @@ task
 You can use the following sql query to get a better understanding of your Airflow-related Snowflake costs:
 
 ```sql
-SET SNOWFLAKE_CREDIT_COST=1.88; // Browse to Admin / Cost Management to know your effective rate.
+// To know your effective credit cost, go to the `Admin` menu on the left and click on `Cost Management`. Copy the value from `Compute price/credit`.
+SET SNOWFLAKE_CREDIT_COST=1.88;
+// How many days you want to include
 SET NUMBER_OF_DAYS=30;
+
 WITH warehouse_sizes AS (
 	SELECT 'X-Small'  AS warehouse_size, 1   AS credits_per_hour UNION ALL
 	SELECT 'Small'    AS warehouse_size, 2   AS credits_per_hour UNION ALL
