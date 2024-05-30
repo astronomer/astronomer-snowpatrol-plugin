@@ -1,8 +1,11 @@
-name: Deploy to PyPi
+name: Deploy to PyPI
 
 on:
+  push:
+    branches:
+      - main
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
   build:
@@ -10,32 +13,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
       - name: Install Hatch
         run: pipx install hatch
       - name: Build dist
         run: hatch build
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: dist/*
           if-no-files-found: error
 
+  publish-dev:
+    name: Publish release to Test PyPI
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/astronomer-snowpatrol-plugin
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: artifacts
+          path: dist/
+      - name: Publish on PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
   publish:
     name: Publish release to PyPI
+    if: github.event_name == 'release' && github.event.action == 'published'
     needs:
       - build
     runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/astronomer-snowpatrol-plugin
-    permissions:
-      id-token: write
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: artifacts
-          path: dist
+          path: dist/
       - name: Publish on PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
