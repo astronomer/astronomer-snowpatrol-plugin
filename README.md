@@ -143,8 +143,8 @@ SELECT query_text,
 	MAX(airflow_started) AS airflow_started,
 	MAX(airflow_operator) AS airflow_operator,
 	COUNT(query_id) AS execution_count,
-	MAX(execution_date) AS first_execution_date,
-	MIN(execution_date) AS last_execution_date,
+	MIN(execution_date) AS first_execution_date,
+	MAX(execution_date) AS last_execution_date,
 	SUM(dollar_cost) AS total_dollar_cost
 FROM query_history
 GROUP BY query_text,
